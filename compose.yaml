@@ -1,0 +1,23 @@
+services:
+simplegrapedb:
+  image: mariadb:latest
+  restart: unless-stopped
+  env_file: .env
+  environment:
+    MYSQL_ROOT_PASSWORD: '${MYSQL_ROOT_PASSWORD}'
+    MYSQL_DATABASE: '${MYSQL_DATABASE}'
+    MYSQL_USER: '${MYSQL_USER}'
+    MYSQL_PASSWORD: '${MYSQL_PASSWORD}'
+
+  volumes:
+    - simplegrape-db-data:/var/lib/mysql
+  networks:
+    - simplegrape-network
+
+
+volumes:
+  simplegrape-db-data:
+
+networks:
+  simplegrape-network:
+    driver: bridge
