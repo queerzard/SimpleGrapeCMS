@@ -18,7 +18,9 @@ public class GrapeUserEntity extends AbstractEntity {
     @Getter @Setter private String password;
 
     @Getter @Setter private boolean enabled;
-    @Getter @Setter private boolean tokenExpired;
+    @Getter @Setter private boolean locked;
+    @Getter @Setter private boolean credentialsExpired;
+    @Getter @Setter private boolean accountExpired;
 
     @OneToMany(mappedBy = "creator")
     @Getter @Setter private Collection<CustomPageEntity> pages;
@@ -30,9 +32,15 @@ public class GrapeUserEntity extends AbstractEntity {
 
     public GrapeUserEntity() {}
 
-    public GrapeUserEntity(String email, String password) {
+    public GrapeUserEntity(String email, String username, String password, boolean enabled, boolean locked, boolean credentialsExpired, boolean accountExpired) {
         this.email = email;
+        this.username = username;
         this.password = password;
+        this.enabled = enabled;
+        this.locked = locked;
+        this.credentialsExpired = credentialsExpired;
+        this.accountExpired = accountExpired;
+
     }
 
 
