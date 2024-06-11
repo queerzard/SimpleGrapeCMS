@@ -16,8 +16,8 @@ public interface IRoleService {
     RoleEntity update(RoleEntity entity);
     RoleEntity add(RoleEntity entity);
     RoleEntity addIfNotExists(RoleEntity entity);
-    RoleEntity addPrivilege(PermissionEntity permissionEntity);
-    RoleEntity removePrivilege(PermissionEntity permissionEntity);
+    RoleEntity addPrivilege(RoleEntity r, PermissionEntity permissionEntity);
+    RoleEntity removePrivilege(RoleEntity r, PermissionEntity permissionEntity);
 
     boolean exists(String roleName);
     long count();
