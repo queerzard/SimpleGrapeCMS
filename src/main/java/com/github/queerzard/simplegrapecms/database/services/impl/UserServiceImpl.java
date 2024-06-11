@@ -1,6 +1,7 @@
 package com.github.queerzard.simplegrapecms.database.services.impl;
 
 import com.github.queerzard.simplegrapecms.database.dto.user.GrapeUserEntity;
+import com.github.queerzard.simplegrapecms.database.repositories.UserRepository;
 import com.github.queerzard.simplegrapecms.database.services.interfaces.IUserService;
 import org.springframework.stereotype.Service;
 
@@ -8,63 +9,66 @@ import java.util.List;
 
 @Service
 public class UserServiceImpl implements IUserService {
+
+    private UserRepository userRepository;
+
     @Override
     public List<GrapeUserEntity> findAll() {
-        return List.of();
+        return this.userRepository.findAll();
     }
 
     @Override
     public List<GrapeUserEntity> findAllEnabled() {
-        return List.of();
+        return this.userRepository.findGrapeUserEntitiesByEnabledIsTrue();
     }
 
     @Override
     public GrapeUserEntity findUserById(String id) {
-        return null;
+        return this.userRepository.findGrapeUserEntityById(id);
     }
 
     @Override
     public GrapeUserEntity findUserByEmail(String email) {
-        return null;
+        return this.userRepository.findGrapeUserEntityByEmail(email);
     }
 
     @Override
     public GrapeUserEntity findUserByName(String username) {
-        return null;
+        return this.userRepository.findGrapeUserEntityByUsername(username);
     }
 
     @Override
     public void delete(GrapeUserEntity userEntity) {
-
+        this.userRepository.delete(userEntity);
     }
 
     @Override
     public boolean exists(GrapeUserEntity userEntity) {
-        return false;
+        return this.userRepository.existsGrapeUserEntityByUsername(userEntity.getUsername());
     }
 
     @Override
     public GrapeUserEntity update(GrapeUserEntity userEntity) {
-        return null;
+        return this.userRepository.save(userEntity);
     }
 
     @Override
     public GrapeUserEntity save(GrapeUserEntity userEntity) {
-        return null;
+        return this.userRepository.save(userEntity);
     }
 
     @Override
     public GrapeUserEntity add(GrapeUserEntity userEntity) {
-        return null;
+        return this.userRepository.save(userEntity);
     }
 
     @Override
     public GrapeUserEntity addIfNotExists(GrapeUserEntity userEntity) {
-        return null;
+        return (!exists(userEntity) ? this.userRepository.save(userEntity) : null);
     }
 
     @Override
     public long count() {
-        return 0;
+        return this.userRepository.count();
     }
 }
