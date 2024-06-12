@@ -19,9 +19,9 @@ public class GrapeAuthenticationProvider implements AuthenticationProvider {
 
     private final PasswordEncoder passwordEncoder;
     private final GrapeUserDetailsService grapeUserDetailsService;
-    @Autowired private final IUserService userService;
+    @Autowired private IUserService userService;
 
-    public GrapeAuthenticationProvider(GrapeUserDetailsService grapeUserDetailsService, IUserService iUserService) {
+    public GrapeAuthenticationProvider(GrapeUserDetailsService grapeUserDetailsService) {
         this.passwordEncoder = new BCryptPasswordEncoder();
         this.grapeUserDetailsService = grapeUserDetailsService;
     }
