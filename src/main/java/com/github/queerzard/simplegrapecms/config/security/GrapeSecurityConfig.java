@@ -16,5 +16,9 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @EnableMethodSecurity(securedEnabled = true, jsr250Enabled = true)
 public class GrapeSecurityConfig {
 
+    public SecurityFilterChain filterChain(){
+        return null;
+    }
+
 
 }
