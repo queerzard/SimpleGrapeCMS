@@ -6,14 +6,18 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.FormLoginConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Order(value = -1)
 @Configuration
@@ -52,7 +56,14 @@ public class GrapeSecurityConfig {
                             .anyRequest()
                             .authenticated()
                     ;
+
                 })
+
+                .formLogin(form ->
+                        form.loginPage("/login").permitAll())
+                .logout(logout ->
+                        logout.logoutUrl("/logout").permitAll()
+                                .logoutSuccessUrl("/logout").clearAuthentication(true))
 
                 .httpBasic(Customizer.withDefaults())
                 .sessionManagement(sessionConfigurer -> {
@@ -66,13 +77,11 @@ public class GrapeSecurityConfig {
     public UserDetailsService userDetailsService() {
         return this.userDetailsService;
     }
-/*
 
-    @Bean
-    public AuthenticationManager authenticationManager(){
-        return new AuthenticationManagerBuilder().authenticationProvider(this.authenticationProvider).build();
+    @Autowired
+    public AuthenticationManager authenticationManager(AuthenticationManagerBuilder auth) throws Exception {
+        return auth.authenticationProvider(this.authenticationProvider).build();
     }
-*/
 
 
 }
