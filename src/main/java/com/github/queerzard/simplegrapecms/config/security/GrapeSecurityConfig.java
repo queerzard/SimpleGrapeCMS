@@ -12,12 +12,12 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.annotation.web.configurers.FormLoginConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.session.SessionRegistryImpl;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Order(value = -1)
 @Configuration
@@ -26,6 +26,9 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 public class GrapeSecurityConfig {
 
     private final GrapeAuthenticationProvider authenticationProvider;
+
+    @Autowired
+    public SessionRegistry sessionRegistry;
 
     @Autowired
     private GrapeUserDetailsService userDetailsService;
@@ -39,14 +42,18 @@ public class GrapeSecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
 
-        httpSecurity.csrf(AbstractHttpConfigurer::disable)
+        httpSecurity
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/v1/**", "/register"))
                 .authorizeHttpRequests((registry) -> {
                     registry
-                            .requestMatchers(HttpMethod.DELETE).hasRole("ROLE_ADMIN")
+
+                            .requestMatchers(HttpMethod.DELETE).hasRole("ADMIN")
+
                             .requestMatchers(
                                     "/",
                                     "/home",
-                                    "/login"
+                                    "/login",
+                                    "/assets/**"
                             ).permitAll()
 
                             .requestMatchers(
@@ -56,31 +63,48 @@ public class GrapeSecurityConfig {
                             .anyRequest()
                             .authenticated()
                     ;
-
                 })
 
                 .formLogin(form ->
-                        form.loginPage("/login").permitAll())
+                        form
+                                .loginPage("/login").permitAll())
                 .logout(logout ->
-                        logout.logoutUrl("/logout").permitAll()
-                                .logoutSuccessUrl("/logout").clearAuthentication(true))
+                        logout
+                                .logoutUrl("/logout").permitAll()
+                                .logoutSuccessUrl("/login?logout")
+                                .clearAuthentication(true)
+                                .permitAll())
 
                 .httpBasic(Customizer.withDefaults())
                 .sessionManagement(sessionConfigurer -> {
-                    sessionConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                    sessionConfigurer
+                            .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
+                            .maximumSessions(1)
+                            .expiredUrl("/login?expired")
+                            .sessionRegistry(this.sessionRegistry);
                 });
 
         return httpSecurity.build();
     }
 
     @Bean
-    public UserDetailsService userDetailsService() {
+    public GrapeUserDetailsService userDetailsService() {
         return this.userDetailsService;
     }
 
     @Autowired
     public AuthenticationManager authenticationManager(AuthenticationManagerBuilder auth) throws Exception {
         return auth.authenticationProvider(this.authenticationProvider).build();
+    }
+
+    @Bean
+    public SessionRegistry sessionRegistry() {
+        return new SessionRegistryImpl();
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
 

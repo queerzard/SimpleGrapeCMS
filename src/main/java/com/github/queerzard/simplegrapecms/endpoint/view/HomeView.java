@@ -1,5 +1,5 @@
 package com.github.queerzard.simplegrapecms.endpoint.view;
 
-public class HomeEndpoint
+public class HomeView
 {
 }
